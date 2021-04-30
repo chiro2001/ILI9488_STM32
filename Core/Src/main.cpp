@@ -46,6 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 SPI_HandleTypeDef hspi1;
+DMA_HandleTypeDef hdma_spi1_tx;
 
 UART_HandleTypeDef huart3;
 
@@ -56,6 +57,7 @@ UART_HandleTypeDef huart3;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
@@ -95,40 +97,44 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   PortmapSPI lcd_spi =PortmapSPI(&hspi1);
-  PortmapIO lcd_dc = PortmapIO(GPIOG,GPIO_PIN_3);
-  PortmapIO lcd_cs = PortmapIO(GPIOG,GPIO_PIN_2);
-  PortmapIO lcd_rst = PortmapIO(GPIOF,GPIO_PIN_12);
+     PortmapIO lcd_dc = PortmapIO(GPIOG,GPIO_PIN_3);
+     PortmapIO lcd_cs = PortmapIO(GPIOG,GPIO_PIN_2);
+     PortmapIO lcd_rst = PortmapIO(GPIOF,GPIO_PIN_12);
 
-  ILI9488 rpi_lcd = ILI9488(&lcd_cs,&lcd_dc, &lcd_rst, &lcd_spi);
-  rpi_lcd.begin();
+     ILI9488 rpi_lcd = ILI9488(&lcd_cs,&lcd_dc, &lcd_rst, &lcd_spi);
+     rpi_lcd.begin();
 
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  rpi_lcd.fillScreen(ILI9488_BLACK);
-	  rpi_lcd.fillScreen(ILI9488_RED);
-	   rpi_lcd.fillScreen(ILI9488_GREEN);
-	   rpi_lcd.fillScreen(ILI9488_BLUE);
-	   rpi_lcd.fillScreen(ILI9488_BLACK);
-	  HAL_Delay(10);
+     while (1)
+     {
+   	  rpi_lcd.fillScreen(ILI9488_BLACK);
+   	  rpi_lcd.fillScreen(ILI9488_RED);
+   	   rpi_lcd.fillScreen(ILI9488_GREEN);
+   	   rpi_lcd.fillScreen(ILI9488_BLUE);
+   	   rpi_lcd.fillScreen(ILI9488_BLACK);
+   	  HAL_Delay(1000);
+   	rpi_lcd.testLines(ILI9488_GREEN);
+   	HAL_Delay(1000);
+   	rpi_lcd.testLines(ILI9488_GREENYELLOW);
 
 
-	  /* USER CODE END WHILE */
-
+    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-  }
+     }
   /* USER CODE END 3 */
 }
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -142,15 +148,26 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 216;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -158,12 +175,12 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
   {
     Error_Handler();
   }
@@ -198,7 +215,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -247,6 +264,22 @@ static void MX_USART3_UART_Init(void)
   /* USER CODE BEGIN USART3_Init 2 */
 
   /* USER CODE END USART3_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
 }
 

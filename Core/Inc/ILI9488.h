@@ -7,7 +7,7 @@
 
 #ifndef ILI9488_H_
 #define ILI9488_H_
-
+#include <math.h>
 #include "PortmapIO.h"
 #include "PortmapSPI.h"
 #include "PortmapUART.h"
@@ -101,6 +101,12 @@
 #define MADCTL_BGR 0x08
 #define MADCTL_MH  0x04
 
+#define _swap_int16_t(a, b) \
+	{int16_t t = a; \
+	a = b;   \
+	b = t; \
+  }
+
 /* GENERAL CONFIGURATIONS */
 
 #define _DEGUG_MODE 1
@@ -123,6 +129,8 @@ class ILI9488 : public PortmapIO, public PortmapSPI
 		void drawPixel(int16_t x, int16_t y, uint16_t color);
 		void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
 		void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+		void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,uint16_t color);
+		void writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,uint16_t color);
 		void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 		void setRotation(uint8_t r);
 		void invertDisplay(uint8_t  i);
@@ -131,6 +139,7 @@ class ILI9488 : public PortmapIO, public PortmapSPI
 		void writecommand(uint8_t c);
 		void write16BitColor(uint16_t color);
 		void writedata(uint8_t d);
+		void testLines(uint8_t color);
 	//	void commandList(uint8_t *addr);
 		//uint8_t  spiread(void);
 

@@ -193,7 +193,6 @@ void ILI9488::drawImage(const uint8_t* img, uint16_t x, uint16_t y, uint16_t w, 
 	_cs->setLow();
 
 	uint8_t linebuff[w * 3 + 1];
-	uint16_t pixels = w * h;
 	uint32_t count = 0;
 	for (uint16_t i = 0; i < h; i++) {
 		uint16_t pixcount = 0;
@@ -268,6 +267,62 @@ void ILI9488::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 		write16BitColor(color);
 	}
 	_cs->setHigh();
+}
+void ILI9488:: drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,uint16_t color)
+{
+	 if (x0 == x1) {
+	    if (y0 > y1)
+	      _swap_int16_t(y0, y1);
+	    drawFastVLine(x0, y0, y1 - y0 + 1, color);
+	  } else if (y0 == y1) {
+	    if (x0 > x1)
+	      _swap_int16_t(x0, x1);
+	    drawFastHLine(x0, y0, x1 - x0 + 1, color);
+	  } else {
+
+	    writeLine(x0, y0, x1, y1, color);
+
+	  }
+
+}
+void ILI9488::writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,uint16_t color) {
+
+  int16_t steep = abs(y1 - y0) > abs(x1 - x0);
+  if (steep) {
+    _swap_int16_t(x0, y0);
+    _swap_int16_t(x1, y1);
+  }
+
+  if (x0 > x1) {
+    _swap_int16_t(x0, x1);
+    _swap_int16_t(y0, y1);
+  }
+
+  int16_t dx, dy;
+  dx = x1 - x0;
+  dy = abs(y1 - y0);
+
+  int16_t err = dx / 2;
+  int16_t ystep;
+
+  if (y0 < y1) {
+    ystep = 1;
+  } else {
+    ystep = -1;
+  }
+
+  for (; x0 <= x1; x0++) {
+    if (steep) {
+      drawPixel(y0, x0, color);
+    } else {
+      drawPixel(x0, y0, color);
+    }
+    err -= dy;
+    if (err < 0) {
+      y0 += ystep;
+      err += dx;
+    }
+  }
 }
 void ILI9488::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 {
@@ -378,6 +433,57 @@ void ILI9488::writedata(uint8_t d)
 	//HAL_SPI_Transmit(_spi.getHandler(), &tmp,1,100);
 	_cs->setHigh();
 
+}
+void ILI9488::testLines(uint8_t color)
+{
+
+	unsigned long start, t;
+	int x1, y1, x2, y2, w = _width, h = _height;
+	fillScreen(ILI9488_BLACK);
+
+	x1 = y1 = 0;
+	y2 = h - 1;
+
+	for (x2 = 0; x2 < w; x2 += 6)
+		drawLine(x1, y1, x2, y2, color);
+	x2 = w - 1;
+	for (y2 = 0; y2 < h; y2 += 6)
+		drawLine(x1, y1, x2, y2, color);
+	fillScreen(ILI9488_BLACK);
+
+	x1 = w - 1;
+	y1 = 0;
+	y2 = h - 1;
+
+	for (x2 = 0; x2 < w; x2 += 6)
+		drawLine(x1, y1, x2, y2, color);
+	x2 = 0;
+	for (y2 = 0; y2 < h; y2 += 6)
+		drawLine(x1, y1, x2, y2, color);
+
+	fillScreen(ILI9488_BLACK);
+
+	x1 = 0;
+	y1 = h - 1;
+	y2 = 0;
+
+	for (x2 = 0; x2 < w; x2 += 6)
+		drawLine(x1, y1, x2, y2, color);
+	x2 = w - 1;
+	for (y2 = 0; y2 < h; y2 += 6)
+		drawLine(x1, y1, x2, y2, color);
+
+	fillScreen(ILI9488_BLACK);
+
+	x1 = w - 1;
+	y1 = h - 1;
+	y2 = 0;
+
+	for (x2 = 0; x2 < w; x2 += 6)
+		drawLine(x1, y1, x2, y2, color);
+	x2 = 0;
+	for (y2 = 0; y2 < h; y2 += 6)
+		drawLine(x1, y1, x2, y2, color);
 }
 /*void ILI9488::commandList(uint8_t *addr)
  {

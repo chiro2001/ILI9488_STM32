@@ -5,16 +5,19 @@ ILI9488.cpp:134:6:void ILI9488::setScrollArea(uint16_t, uint16_t)	16	static
 ILI9488.cpp:144:6:void ILI9488::scroll(uint16_t)	16	static
 ILI9488.cpp:150:7:void ILI9488::pushColor(uint16_t)	16	static
 ILI9488.cpp:157:6:void ILI9488::pushColors(uint16_t*, uint8_t, uint8_t)	48	dynamic
-ILI9488.cpp:182:6:void ILI9488::drawImage(const uint8_t*, uint16_t, uint16_t, uint16_t, uint16_t)	72	dynamic
-ILI9488.cpp:221:6:void ILI9488::fillScreen(uint16_t)	24	static
-ILI9488.cpp:225:6:void ILI9488::drawPixel(int16_t, int16_t, uint16_t)	32	static
-ILI9488.cpp:237:6:void ILI9488::drawFastVLine(int16_t, int16_t, int16_t, uint16_t)	40	static
-ILI9488.cpp:256:6:void ILI9488::drawFastHLine(int16_t, int16_t, int16_t, uint16_t)	32	static
-ILI9488.cpp:272:6:void ILI9488::fillRect(int16_t, int16_t, int16_t, int16_t, uint16_t)	40	static
-ILI9488.cpp:296:6:void ILI9488::setRotation(uint8_t)	16	static
-ILI9488.cpp:325:6:void ILI9488::invertDisplay(uint8_t)	16	static
-ILI9488.cpp:331:10:uint16_t ILI9488::color565(uint8_t, uint8_t, uint8_t)	16	static
-ILI9488.cpp:335:6:void ILI9488::spiwrite(uint8_t)	24	static
-ILI9488.cpp:341:6:void ILI9488::writecommand(uint8_t)	24	static
-ILI9488.cpp:355:6:void ILI9488::write16BitColor(uint16_t)	24	static
-ILI9488.cpp:371:6:void ILI9488::writedata(uint8_t)	24	static
+ILI9488.cpp:182:6:void ILI9488::drawImage(const uint8_t*, uint16_t, uint16_t, uint16_t, uint16_t)	64	dynamic
+ILI9488.cpp:220:6:void ILI9488::fillScreen(uint16_t)	24	static
+ILI9488.cpp:224:6:void ILI9488::drawPixel(int16_t, int16_t, uint16_t)	32	static
+ILI9488.cpp:236:6:void ILI9488::drawFastVLine(int16_t, int16_t, int16_t, uint16_t)	40	static
+ILI9488.cpp:255:6:void ILI9488::drawFastHLine(int16_t, int16_t, int16_t, uint16_t)	32	static
+ILI9488.cpp:271:6:void ILI9488::drawLine(int16_t, int16_t, int16_t, int16_t, uint16_t)	40	static
+ILI9488.cpp:288:6:void ILI9488::writeLine(int16_t, int16_t, int16_t, int16_t, uint16_t)	48	static
+ILI9488.cpp:327:6:void ILI9488::fillRect(int16_t, int16_t, int16_t, int16_t, uint16_t)	40	static
+ILI9488.cpp:351:6:void ILI9488::setRotation(uint8_t)	16	static
+ILI9488.cpp:380:6:void ILI9488::invertDisplay(uint8_t)	16	static
+ILI9488.cpp:386:10:uint16_t ILI9488::color565(uint8_t, uint8_t, uint8_t)	16	static
+ILI9488.cpp:390:6:void ILI9488::spiwrite(uint8_t)	24	static
+ILI9488.cpp:396:6:void ILI9488::writecommand(uint8_t)	24	static
+ILI9488.cpp:410:6:void ILI9488::write16BitColor(uint16_t)	24	static
+ILI9488.cpp:426:6:void ILI9488::writedata(uint8_t)	24	static
+ILI9488.cpp:437:6:void ILI9488::testLines(uint8_t)	56	static
