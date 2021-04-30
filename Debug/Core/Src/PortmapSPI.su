@@ -1,0 +1,5 @@
+PortmapSPI.cpp:10:1:PortmapSPI::PortmapSPI()	16	static
+PortmapSPI.cpp:14:1:PortmapSPI::PortmapSPI(SPI_HandleTypeDef*)	16	static
+PortmapSPI.cpp:18:6:void PortmapSPI::setHandler(SPI_HandleTypeDef*)	16	static
+PortmapSPI.cpp:22:20:SPI_HandleTypeDef* PortmapSPI::getHandler()	16	static
+PortmapSPI.cpp:26:6:void PortmapSPI::send(uint8_t*)	16	static

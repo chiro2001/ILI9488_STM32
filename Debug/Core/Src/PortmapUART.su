@@ -1,0 +1,4 @@
+PortmapUART.cpp:10:1:PortmapUART::PortmapUART()	16	static
+PortmapUART.cpp:14:1:PortmapUART::PortmapUART(UART_HandleTypeDef)	16	static
+PortmapUART.cpp:18:6:void PortmapUART::setHandler(UART_HandleTypeDef)	16	static
+PortmapUART.cpp:22:20:UART_HandleTypeDef PortmapUART::getHandler()	16	static
