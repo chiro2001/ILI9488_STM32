@@ -110,7 +110,7 @@
 /* GENERAL CONFIGURATIONS */
 
 #define _DEGUG_MODE 1
-
+#define SINGLE_IO_MODE 1
 
 class ILI9488 : public PortmapIO, public PortmapSPI
 {
@@ -118,6 +118,7 @@ class ILI9488 : public PortmapIO, public PortmapSPI
 		ILI9488 ();
 		//ILI9488(PortmapIO CS, PortmapIO DC, PortmapIO RST,PortmapSPI spi,PortmapUART uart);
 		ILI9488(PortmapIO *CS, PortmapIO *DC, PortmapIO *RST,PortmapSPI *spi);
+		ILI9488(PortmapIO *CS, PortmapIO *DC, PortmapIO *RST,PortmapIO *SCK, PortmapIO *MOSI);
 		void begin(void);
 		void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 		void setScrollArea(uint16_t topFixedArea, uint16_t bottomFixedArea);
@@ -140,6 +141,7 @@ class ILI9488 : public PortmapIO, public PortmapSPI
 		void write16BitColor(uint16_t color);
 		void writedata(uint8_t d);
 		void testLines(uint8_t color);
+		void sendasIO(uint8_t d);
 	//	void commandList(uint8_t *addr);
 		//uint8_t  spiread(void);
 
@@ -150,6 +152,8 @@ class ILI9488 : public PortmapIO, public PortmapSPI
 		PortmapIO *_dc;
 		PortmapIO *_rst;
 		PortmapSPI *_spi;
+		PortmapIO *_sck;
+		PortmapIO *_mosi;
 		//PortmapUART _uart;
 		//Adafruit fields
 		int16_t WIDTH;

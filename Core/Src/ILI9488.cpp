@@ -25,6 +25,15 @@ ILI9488::ILI9488(PortmapIO *CS, PortmapIO *DC, PortmapIO *RST, PortmapSPI *spi)
 	_spi=spi;
 
 }
+ILI9488::ILI9488(PortmapIO *CS, PortmapIO *DC, PortmapIO *RST,PortmapIO *SCK, PortmapIO *MOSI)
+{
+	_cs=CS;
+	_dc=DC;
+	_rst=RST;
+	_sck=SCK;
+	_mosi=MOSI;
+
+}
 void ILI9488::begin(void)
 {
 	_rst->setLow();
@@ -347,6 +356,18 @@ void ILI9488::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t colo
 
 	_cs->setHigh();
 
+	_dc->setHigh();
+		_cs->setLow();
+
+		for (y = h; y > 0; y--) {
+			for (x = w; x > 0; x--) {
+
+				write16BitColor(ILI9488_DARKGREY);
+			}
+		}
+
+		_cs->setHigh();
+
 }
 void ILI9488::setRotation(uint8_t r)
 {
@@ -400,8 +421,10 @@ void ILI9488::writecommand(uint8_t c)
 
 	//  digitalWrite(_sclk, LOW);
 	_cs->setLow();
-
-	_spi->send(&d);
+	if(SINGLE_IO_MODE)
+		sendasIO(c);
+	else
+		_spi->send(&d);
 	//HAL_SPI_Transmit(_spi.getHandler(), &d,1,100);
 
 	_cs->setHigh();
@@ -417,10 +440,17 @@ void ILI9488::write16BitColor(uint16_t color)
 	  r = (r * 255) / 31;
 	  g = (g * 255) / 63;
 	  b = (b * 255) / 31;
-
+	  if(SINGLE_IO_MODE)
+	  {
+		  sendasIO(r);
+		  sendasIO(g);
+		  sendasIO(b);
+	  }
+	  else{
 	  _spi->send(&r);
 	  _spi->send(&g);
 	  _spi->send(&b);
+	  }
 
 }
 void ILI9488::writedata(uint8_t d)
@@ -429,6 +459,9 @@ void ILI9488::writedata(uint8_t d)
 	uint8_t tmp=d;
 	_dc->setHigh();
 	_cs->setLow();
+	if(SINGLE_IO_MODE)
+		sendasIO(d);
+	else
 	_spi->send(&tmp);
 	//HAL_SPI_Transmit(_spi.getHandler(), &tmp,1,100);
 	_cs->setHigh();
@@ -484,6 +517,26 @@ void ILI9488::testLines(uint8_t color)
 	x2 = 0;
 	for (y2 = 0; y2 < h; y2 += 6)
 		drawLine(x1, y1, x2, y2, color);
+}
+void ILI9488::sendasIO(uint8_t d)
+{
+	for (uint8_t bit = 0x80; bit; bit >>= 1) {
+
+		if (d & bit) {
+			//_mosi->setHigh();
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+		} else {
+			//_mosi->setLow();
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+		}
+		//_sck->setHigh();
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+		//HAL_Delay(4);
+		//__ASM volatile ("NOP");
+
+		//_sck->setLow();
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+	}
 }
 /*void ILI9488::commandList(uint8_t *addr)
  {
